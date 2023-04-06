@@ -923,7 +923,7 @@ function SettingsController($scope, SharedService) {
     // Initialized for an unauthenticated user exploring the current bucket
     // TODO: calculate current bucket and initialize below
     $scope.settings = {
-        auth: 'anon', region: '', bucket: '', entered_bucket: '', selected_bucket: '', view: 'folder', delimiter: '/', prefix: '',
+        auth: 'auth', region: '', bucket: '', entered_bucket: '', selected_bucket: '', view: 'folder', delimiter: '/', prefix: '',
     };
     $scope.settings.mfa = { use: 'no', code: '' };
     $scope.settings.cred = { accessKeyId: '', secretAccessKey: '', sessionToken: '' };
@@ -933,6 +933,25 @@ function SettingsController($scope, SharedService) {
     // even if the subsequent AWS calls fail with networking or permissions errors. It
     // would be better for the Settings dialog to synchronously make the necessary API
     // calls and ensure they succeed before closing the modal dialog.
+    $scope.setCredentials = () => {
+        DEBUG.log('SET CREDENTIALS');
+
+        const s3 = new AWS.S3({
+            accessKeyId: $scope.settings.cred.accessKeyId,
+            secretAccessKey: $scope.settings.cred.secretAccessKey
+        })
+
+        s3.listBuckets((err, data) => {
+            if (err) {
+                console.log(err);
+            } else {
+                data.Buckets.forEach(bucket => {
+                    console.log(bucket.Name);
+                });
+            }
+        });
+    }
+
     $scope.update = () => {
         DEBUG.log('Settings updated');
         $('#SettingsModal').modal('hide');
