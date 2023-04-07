@@ -82,11 +82,19 @@ permissions and limitations under the License.
                                             <span class="input-group-addon">MFA Code</span>
                                             <input name="token" type="text" ng-model="settings.mfa.code" class="form-control" ng-disabled="settings.mfa.use=='no'" placeholder="MFA code" required/>
                                         </div>
+                                        <div style="text-align: right;">
+                                            <button id="auth-button" type="button" class="btn btn-primary" ng-click="setCredentials()" >Auth</button>
+                                        </div>
+                                        
+                                        <div style="text-align: center;">
+                                            <div class="lds-ring" id="loader-ring" style="display: none;"><div></div><div></div><div></div><div></div></div>
+                                        </div>
+                                        
                                         <!--
                                         ////////////////////////////////
                                         ///////////////////////////////
                                         -->
-                                        <div>
+                                        <div id="bucket-form" style="display: none;">
                                             <p><b>Bucket</b>: Please indicate which region and S3 bucket you want to explore.</p>
                                             <div class="input-group bottom-marg-10">
                                                 <span class="input-group-addon">Region</span>
@@ -110,18 +118,18 @@ permissions and limitations under the License.
                                                     <option value="us-west-2">US West (Oregon)</option> -->
                                                 </select>
                                             </div>
-                                            <div class="input-group bottom-marg-10" ng-show="settings.buckets.length">
+                                            <div class="input-group bottom-marg-10">
                                                 <span class="input-group-addon">Bucket</span>
-                                                <select name="bucketlist" class="form-control" ng-model="settings.selected_bucket" placeholder="bucket" ng-required="buckets.length">
+                                                <select name="bucketlist" class="form-control" ng-model="settings.selected_bucket" placeholder="bucket" >
                                                     <!-- <option value="" disabled selected>Select a bucket ...</option> -->
-                                                    <option ng-repeat="bucket in settings.buckets" value="{{bucket}}">{{bucket}}</option>
-                                                    <option value="">Other ...</option>
+                                                    <option ng-show="settings.region == ''" ng-repeat="bucket in settings.userBuckets.virginia" value="{{bucket}}">{{bucket}}</option>
+                                                    <option ng-show="settings.region == 'us-east-2'" ng-repeat="bucket in settings.userBuckets.ohio" value="{{bucket}}">{{bucket}}</option>
                                                 </select>
                                             </div>
-                                            <div class="input-group bottom-marg-10" ng-hide="settings.buckets.length && settings.selected_bucket!=''">
+                                            <!-- <div class="input-group bottom-marg-10" ng-hide="settings.buckets.length && settings.selected_bucket!=''">
                                                 <span class="input-group-addon">Bucket</span>
                                                 <input name="bucket" ng-model="settings.entered_bucket" type="text" class="form-control" placeholder="bucket"/>
-                                            </div>
+                                            </div> -->
                                             <p><b>Options</b>: S3 Explorer can show your S3 bucket contents folder-by-folder or it can show
                                             a flat view of the entire bucket. Also, if you want to start in a folder that is not the root folder then enter the initial prefix below, for example <i>songs/</i>.</p>
                                             <div class="input-group bottom-marg-10">
@@ -148,7 +156,7 @@ permissions and limitations under the License.
                             <div class="form-group">
                                 <div class="col-sm-offset-2 col-sm-10">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary"><i class='fa fa-cloud-download-alt fa-lg'></i>&nbsp;Query S3</button>
+                                    <button type="submit" id="submit-button" style="display:none" class="btn btn-primary"><i class='fa fa-cloud-download-alt fa-lg'></i>&nbsp;Query S3</button>
                                 </div>
                             </div>
                         </div>

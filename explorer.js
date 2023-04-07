@@ -928,27 +928,51 @@ function SettingsController($scope, SharedService) {
     $scope.settings.mfa = { use: 'no', code: '' };
     $scope.settings.cred = { accessKeyId: '', secretAccessKey: '', sessionToken: '' };
     $scope.settings.stscred = null;
-    $scope.settings.buckets = window.buckets || [];
+    $scope.settings.buckets = {}
+    $scope.settings.buckets.virginia =  window.buckets[""]
+    $scope.settings.buckets.ohio =  window.buckets["us-east-2"];
+    $scope.settings.userBuckets = {};
+    $scope.settings.bucketLoaded = false;
 
     // TODO: at present the Settings dialog closes after credentials have been supplied
     // even if the subsequent AWS calls fail with networking or permissions errors. It
     // would be better for the Settings dialog to synchronously make the necessary API
     // calls and ensure they succeed before closing the modal dialog.
-    $scope.setCredentials = () => {
-        // DEBUG.log('SET CREDENTIALS');
+    $scope.setCredentials = async() => {
+        DEBUG.log('SET CREDENTIALS');
 
-        // const s3 = new AWS.S3({
-        //     accessKeyId: $scope.settings.cred.accessKeyId,
-        //     secretAccessKey: $scope.settings.cred.secretAccessKey
-        // })
+        await AWS.config.update($scope.settings.cred);
 
-        // s3.getBucketAcl({ Bucket: 'image-conversion-temp' }, (err, data) => {
-        //     if (err) {
-        //         console.log('User does not have access to bucket');
-        //     } else {
-        //         console.log('User has access to bucket');
-        //     }
-        // });
+        const s3 = new AWS.S3(AWS.config);
+        const buckets = $scope.settings.buckets;
+
+        async function checkBucketAccess(bucket) {
+            try {
+              await s3.getBucketLocation({ Bucket: bucket }).promise();
+              const key = Object.keys(buckets).find(key => buckets[key].includes(bucket));
+              if($scope.settings.userBuckets[key] === undefined) $scope.settings.userBuckets[key] = [];
+              $scope.settings.userBuckets[key].push(bucket);
+              console.log("$scope.settings.userBuckets", $scope.settings.userBuckets);
+              
+            } catch (err) {
+                console.error(err);
+              console.log(`Access denied to bucket: ${bucket}`);
+            }
+          }
+          
+          async function checkMultipleBuckets(buckets) {
+            const arrBuckets = [].concat(...Object.values(buckets));
+            await Promise.all(arrBuckets.map(bucket => checkBucketAccess(bucket)));
+          }
+          const loader =  document.getElementById("loader-ring");
+          loader.style.display = "block";
+
+
+          await checkMultipleBuckets(buckets);
+          loader.style.display = "none";
+          document.getElementById("bucket-form").style.display = "block";
+          document.getElementById("auth-button").style.display = "none";
+          document.getElementById("submit-button").style.display = "inline-block";
     }
 
     $scope.update = () => {
