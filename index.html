@@ -98,7 +98,7 @@ permissions and limitations under the License.
                                             <p><b>Bucket</b>: Please indicate which region and S3 bucket you want to explore.</p>
                                             <div class="input-group bottom-marg-10">
                                                 <span class="input-group-addon">Region</span>
-                                                <select name="region" class="form-control" ng-model="settings.region">
+                                                <select name="region" id="regionlist" class="form-control" ng-model="settings.region">
                                                     <!-- <option value="ap-south-1">Asia Pacific (Mumbai)</option>
                                                     <option value="ap-northeast-3">Asia Pacific (Osaka-Local)</option>
                                                     <option value="ap-northeast-2">Asia Pacific (Seoul)</option>
@@ -122,7 +122,7 @@ permissions and limitations under the License.
                                                 <span class="input-group-addon">Bucket</span>
                                                 <select name="bucketlist" class="form-control" ng-model="settings.selected_bucket" placeholder="bucket" >
                                                     <!-- <option value="" disabled selected>Select a bucket ...</option> -->
-                                                    <option ng-show="settings.region == ''" ng-repeat="bucket in settings.userBuckets.virginia" value="{{bucket}}">{{bucket}}</option>
+                                                    <option ng-hide="settings.region == 'us-east-2'" ng-repeat="bucket in settings.userBuckets.virginia" value="{{bucket}}">{{bucket}}</option>
                                                     <option ng-show="settings.region == 'us-east-2'" ng-repeat="bucket in settings.userBuckets.ohio" value="{{bucket}}">{{bucket}}</option>
                                                 </select>
                                             </div>

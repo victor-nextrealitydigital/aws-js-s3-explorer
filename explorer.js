@@ -923,7 +923,7 @@ function SettingsController($scope, SharedService) {
     // Initialized for an unauthenticated user exploring the current bucket
     // TODO: calculate current bucket and initialize below
     $scope.settings = {
-        auth: 'auth', region: '', bucket: '', entered_bucket: '', selected_bucket: '', view: 'folder', delimiter: '/', prefix: '',
+        auth: 'auth', region: "", bucket: '', entered_bucket: '', selected_bucket: '', view: 'folder', delimiter: '/', prefix: '',
     };
     $scope.settings.mfa = { use: 'no', code: '' };
     $scope.settings.cred = { accessKeyId: '', secretAccessKey: '', sessionToken: '' };
@@ -948,15 +948,13 @@ function SettingsController($scope, SharedService) {
 
         async function checkBucketAccess(bucket) {
             try {
-              await s3.getBucketLocation({ Bucket: bucket }).promise();
+              await s3.getBucketCors({ Bucket: bucket }).promise();
               const key = Object.keys(buckets).find(key => buckets[key].includes(bucket));
               if($scope.settings.userBuckets[key] === undefined) $scope.settings.userBuckets[key] = [];
               $scope.settings.userBuckets[key].push(bucket);
-              console.log("$scope.settings.userBuckets", $scope.settings.userBuckets);
               
             } catch (err) {
                 console.error(err);
-              console.log(`Access denied to bucket: ${bucket}`);
             }
           }
           
@@ -969,10 +967,18 @@ function SettingsController($scope, SharedService) {
 
 
           await checkMultipleBuckets(buckets);
+          if($scope.settings.userBuckets.virginia === undefined && 
+            $scope.settings.userBuckets.ohio == undefined) {
+                loader.style.display = "none";
+                alert("Invalid credentials, please try again");
+                return;
+            }
           loader.style.display = "none";
+          document.getElementById("regionlist").value = "''";
           document.getElementById("bucket-form").style.display = "block";
           document.getElementById("auth-button").style.display = "none";
           document.getElementById("submit-button").style.display = "inline-block";
+
     }
 
     $scope.update = () => {
