@@ -122,8 +122,8 @@ permissions and limitations under the License.
                                                 <span class="input-group-addon">Bucket</span>
                                                 <select name="bucketlist" class="form-control" ng-model="settings.selected_bucket" placeholder="bucket" >
                                                     <!-- <option value="" disabled selected>Select a bucket ...</option> -->
-                                                    <option ng-hide="settings.region == 'us-east-2'" ng-repeat="bucket in settings.userBuckets.virginia" value="{{bucket}}">{{bucket}}</option>
-                                                    <option ng-show="settings.region == 'us-east-2'" ng-repeat="bucket in settings.userBuckets.ohio" value="{{bucket}}">{{bucket}}</option>
+                                                    <option ng-hide="settings.region == 'us-east-2'" ng-repeat="bucket in settings.buckets.virginia" value="{{bucket}}">{{bucket}}</option>
+                                                    <option ng-show="settings.region == 'us-east-2'" ng-repeat="bucket in settings.buckets.ohio" value="{{bucket}}">{{bucket}}</option>
                                                 </select>
                                             </div>
                                             <!-- <div class="input-group bottom-marg-10" ng-hide="settings.buckets.length && settings.selected_bucket!=''">

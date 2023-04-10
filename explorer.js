@@ -948,13 +948,12 @@ function SettingsController($scope, SharedService) {
 
         async function checkBucketAccess(bucket) {
             try {
-              await s3.getBucketCors({ Bucket: bucket }).promise();
-              const key = Object.keys(buckets).find(key => buckets[key].includes(bucket));
-              if($scope.settings.userBuckets[key] === undefined) $scope.settings.userBuckets[key] = [];
-              $scope.settings.userBuckets[key].push(bucket);
+              const response = await s3.getBucketLocation({ Bucket: bucket }).promise();
+              return true;
               
             } catch (err) {
                 console.error(err);
+              return false;
             }
           }
           
@@ -966,18 +965,17 @@ function SettingsController($scope, SharedService) {
           loader.style.display = "block";
 
 
-          await checkMultipleBuckets(buckets);
-          if($scope.settings.userBuckets.virginia === undefined && 
-            $scope.settings.userBuckets.ohio == undefined) {
-                loader.style.display = "none";
-                alert("Invalid credentials, please try again");
-                return;
-            }
-          loader.style.display = "none";
-          document.getElementById("regionlist").value = "''";
-          document.getElementById("bucket-form").style.display = "block";
-          document.getElementById("auth-button").style.display = "none";
-          document.getElementById("submit-button").style.display = "inline-block";
+          const canAccess = await checkBucketAccess("s3-navigator-nr");
+          if(canAccess) {
+            document.getElementById("regionlist").value = "''";
+            loader.style.display = "none";
+            document.getElementById("bucket-form").style.display = "block";
+            document.getElementById("auth-button").style.display = "none";
+            document.getElementById("submit-button").style.display = "inline-block";
+          } else {
+            loader.style.display = "none";
+            alert("Invalid credentials, please try again");
+          }
 
     }
 
